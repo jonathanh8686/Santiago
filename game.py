@@ -1,6 +1,25 @@
 from Card import Card
-from inputvalidator import isValidInput
 from CardCall import *
+from HSCall import *
+import solve
+
+def isValidInput(player_list, move_list, inp):
+    if(len(inp) < 3):
+        return False
+
+    if(len(inp) == 3):
+        if(inp[0] not in player_list):
+            return False
+        if(inp[1] not in player_list):
+            return False
+    else:
+        if(inp[0] not in player_list):
+            return False
+        if(inp[1] not in ["S+", "S-", "C+", "C-", "H+", "H-", "D+", "D-", "J8"]):
+            return False
+
+    return True
+
 
 print("Initalizing Deck")
 NUM_PLAYERS = 6
@@ -37,14 +56,15 @@ while(True):
         # cardcall
 
         called_card = Card(move_dat[2][:-1], move_dat[2][-1])
-        print(called_card)
         move = CardCall(move_dat[0], move_dat[1], called_card)
-        print(move)
         move_list.append(move)
 
     else:
         # p1 hs callstring (min length 7)
         # hscall
-        pass
+
+        move = HSCall(move_dat[0], move_dat[1], " ".join(move_dat[2:]))
+        move_list.append(move)
+    solve.process_move(player_list, move_list)
 
 
