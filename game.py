@@ -5,20 +5,20 @@ import solve
 
 def isValidInput(player_list, move_list, inp):
     if(len(inp) < 3):
-        return False
+        return (False, "Not enough elements in input -- not any type of move!")
 
     if(len(inp) == 3):
         if(inp[0] not in player_list):
-            return False
+            return (False, f"Player {inp[0]} not found in player_list!")
         if(inp[1] not in player_list):
-            return False
+            return (False, f"Player {inp[1]} not found in player_list!")
     else:
         if(inp[0] not in player_list):
-            return False
+            return (False, f"Player {inp[0]} not found in player_list!")
         if(inp[1] not in ["S+", "S-", "C+", "C-", "H+", "H-", "D+", "D-", "J8"]):
-            return False
+            return (False, f"PLayer {inp[1]} not found in player_list!")
 
-    return True
+    return (True, "Success")
 
 
 print("Initalizing Deck")
@@ -35,36 +35,53 @@ DECK.append(Card("J", "-")) # smol joker
 
 print("Deck Initalized")
 
-move_list, player_list = [], []
-print("Game Started!")
+def play_game(fileinp = ""):
+    if(fileinp != ""):
+        fileobj = open(fileinp, "r")
 
-print("Enter Player Information:")
-# sitting in a circle, go around
-for i in range(NUM_PLAYERS):
-    print(f"Player {i}:", end="\t")
-    player_list.append(input().strip())
+    move_list, player_list = [], []
+    print("Game Started!")
 
-while(True):
-    print("Enter Move:")
-    move_dat = input().strip().split(" ")
-    if(isValidInput(player_list, move_list, move_dat) == False):
-        print("Invalid Input!")
-        continue
+    print("Enter Player Information:")
+    # sitting in a circle, go around
+    for i in range(NUM_PLAYERS):
+        print(f"Player {i}:", end="\t")
+        if(fileinp == ""):
+            player_list.append(input().strip())
+        else:
+            player_list.append(fileobj.readline().strip())
 
-    if(len(move_dat) == 3):
-        # p1 p2 card
-        # cardcall
+    while(True):
+        if(fileinp == ""):
+            print("Enter Move:")
+            move_dat = input().strip().split(" ")
+        else:
+            move_dat = fileobj.readline().strip().split(" ")
+            print(move_dat)
+            if(move_dat == ['']):
+                print("End of file detected. (Exiting)")
+                break
 
-        called_card = Card(move_dat[2][:-1], move_dat[2][-1])
-        move = CardCall(move_dat[0], move_dat[1], called_card)
-        move_list.append(move)
+        validres = isValidInput(player_list, move_list, move_dat)
+        if(validres[0] == False):
+            print(f"Invalid Input! Reason: {validres[1]}")
+            continue
 
-    else:
-        # p1 hs callstring (min length 7)
-        # hscall
+        if(len(move_dat) == 3):
+            # p1 p2 card
+            # cardcall
 
-        move = HSCall(move_dat[0], move_dat[1], " ".join(move_dat[2:]))
-        move_list.append(move)
+            called_card = Card(move_dat[2][:-1], move_dat[2][-1])
+            move = CardCall(move_dat[0], move_dat[1], called_card)
+            move_list.append(move)
+
+        else:
+            # p1 hs callstring (min length 7)
+            # hscall
+
+            move = HSCall(move_dat[0], move_dat[1], " ".join(move_dat[2:]))
+            move_list.append(move)
+    # real-time game: process at the end of every move and update
     solve.process_move(player_list, move_list)
 
-
+play_game("testdata.txt")
