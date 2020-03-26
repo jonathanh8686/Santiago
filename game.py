@@ -39,7 +39,7 @@ def play_game(fileinp = ""):
     if(fileinp != ""):
         fileobj = open(fileinp, "r")
 
-    move_list, player_list = [], []
+    move_list, player_list, hand = [], [], []
     print("Game Started!")
 
     print("Enter Player Information:")
@@ -50,6 +50,12 @@ def play_game(fileinp = ""):
             player_list.append(input().strip())
         else:
             player_list.append(fileobj.readline().strip())
+
+    print("Enter Hand Information:")
+    if(fileinp == ""):
+        hand = input().strip().split("  ")
+    else:
+        hand = fileobj.readline().strip().split(" ")
 
     while(True):
         if(fileinp == ""):
@@ -82,6 +88,6 @@ def play_game(fileinp = ""):
             move = HSCall(move_dat[0], move_dat[1], " ".join(move_dat[2:]))
             move_list.append(move)
     # real-time game: process at the end of every move and update
-    solve.process_move(player_list, move_list)
+    solve.process_move(player_list, move_list, hand)
 
 play_game("testdata.txt")
